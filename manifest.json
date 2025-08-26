@@ -11,6 +11,12 @@
       "32": "icon-32.png"
     }
   },
+  "sidebar_action": {
+    "default_popup": "src/pages/sidebar/index.html",
+    "default_icon": {
+      "32": "icon-32.png"
+    }
+  },
   "chrome_url_overrides": {
     "newtab": "src/pages/newtab/index.html"
   },
