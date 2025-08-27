@@ -12,7 +12,7 @@
     }
   },
   "sidebar_action": {
-    "default_popup": "src/pages/sidebar/index.html",
+    "default_panel": "src/pages/sidebar/index.html",
     "default_icon": {
       "32": "icon-32.png"
     }
@@ -23,8 +23,24 @@
   "icons": {
     "128": "icon-128.png"
   },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self';"
+  },
   "permissions": [
-    "activeTab"
+    "alarms",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "idle",
+    "storage",
+    "tabs",
+    "unlimitedStorage",
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking"
   ],
   "content_scripts": [
     {
