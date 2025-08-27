@@ -3,16 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function Vault({
 	apiKey,
-	setPath,
+	obsidianURL,
+	path,
+	pushPath,
+	popPath,
 }: {
 	apiKey: string;
-	setPath: (path: string) => void;
+	obsidianURL: string;
+	path: string;
+	pushPath: (path: string) => void;
+	popPath: () => void;
 }) {
 	const fetchVaultFiles = async () => {
 		if (!apiKey) {
 			throw new Error("Missing API Key");
 		}
-		const baseURL = "http://127.0.0.1:27123/vault/";
+		const baseURL = `${obsidianURL}/vault/${path}`;
 		const bearer = `Bearer ${apiKey}`;
 		const response = await fetch(baseURL, {
 			headers: {
@@ -39,7 +45,8 @@ export default function Vault({
 		return <p>Error: ${error.message}</p>;
 	}
 
-	const mdFiles = data.files.filter((v) => v.endsWith(".md"));
+	//const mdFiles = data.files.filter((v) => v.endsWith(".md"));
+	const mdFiles = data.files;
 
 	return (
 		<div>
@@ -49,7 +56,7 @@ export default function Vault({
 						<li
 							className="cursor-pointer"
 							key={v}
-							onMouseDown={() => setPath(v)}
+							onMouseDown={() => pushPath(v)}
 						>
 							{v}
 						</li>

@@ -5,17 +5,29 @@ import Note from "./Note";
 import Vault from "./Vault";
 
 export default function Sidebar() {
+	const obsidianURL = "http://127.0.0.1:27123";
+
 	const queryClient = new QueryClient();
 	const [apiKey, setApiKey] = useState<string>("");
-	const [path, setPath] = useState<string>("");
 	const [currentTab, setCurrentTab] = useState<string>("");
+	const [rawPath, setPathParts] = useState<string[]>([]);
+	const [path, setPath] = useState("");
 
 	useEffect(() => {
 		setApiKey(localStorage.getItem("api-key") || "");
 	}, []);
 
-	const handleSetPath = (path: string) => {
-		setPath(path);
+	const pushPath = (newPart: string) => {
+		setPathParts((curr) => [...curr, newPart]);
+	};
+
+	useEffect(() => {
+		setPath(rawPath.join(""));
+	}, [rawPath]);
+
+	const popPath = () => {
+		if (rawPath.length === 0) return;
+		setPathParts((curr) => [...curr.slice(0, -1)]);
 	};
 
 	const updateActiveTab = () => {
@@ -30,9 +42,28 @@ export default function Sidebar() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<Vault apiKey={apiKey} setPath={handleSetPath} />
+			<p onMouseDown={popPath} className="cursor-pointer">
+				...
+			</p>
+			{!path.includes(".") && (
+				<Vault
+					obsidianURL={obsidianURL}
+					apiKey={apiKey}
+					key={path}
+					path={path}
+					pushPath={pushPath}
+					popPath={popPath}
+				/>
+			)}
 			<br />
-			{path && <Note key={path} apiKey={apiKey} path={path} />}
+			{path.includes(".") && (
+				<Note
+					key={path}
+					obsidianURL={obsidianURL}
+					apiKey={apiKey}
+					path={path}
+				/>
+			)}
 		</QueryClientProvider>
 	);
 }

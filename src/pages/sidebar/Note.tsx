@@ -3,16 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function Note({
 	apiKey,
+	obsidianURL,
 	path,
 }: {
 	apiKey: string;
+	obsidianURL: string;
 	path: string;
 }) {
 	const fetchVaultFiles = async () => {
 		if (!apiKey) {
 			throw new Error("Missing API Key");
 		}
-		const baseURL = "http://127.0.0.1:27123/vault";
+		const baseURL = `${obsidianURL}/vault`;
 		const fullPath = `${baseURL}/${path}`;
 		const bearer = `Bearer ${apiKey}`;
 		const response = await fetch(fullPath, {
