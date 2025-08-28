@@ -42,9 +42,11 @@ export default function Sidebar() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<p onMouseDown={popPath} className="cursor-pointer">
-				...
-			</p>
+			{rawPath.length > 0 && (
+				<p onMouseDown={popPath} className="cursor-pointer">
+					...
+				</p>
+			)}
 			{!path.includes(".") && (
 				<Vault
 					obsidianURL={obsidianURL}
