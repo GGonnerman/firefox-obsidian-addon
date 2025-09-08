@@ -14,8 +14,9 @@ export default function Vault({
 	pushPath: (path: string) => void;
 	popPath: () => void;
 }) {
-	const fetchVaultFiles = async () => {
-		if (!apiKey) {
+	// TODO [SCRUM-19] Either prefetch paths or cache vault paths and then revalidate on click
+	const fetchVaultPath = async () => {
+		if (!apiKey || apiKey === "") {
 			throw new Error("Missing API Key");
 		}
 		const baseURL = `${obsidianURL}/vault/${path}`;
@@ -33,8 +34,8 @@ export default function Vault({
 	};
 
 	const { isLoading, isError, data, error } = useQuery({
-		queryKey: ["vaultFiles"],
-		queryFn: fetchVaultFiles,
+		queryKey: ["vaultPath"],
+		queryFn: fetchVaultPath,
 	});
 
 	if (isLoading) {
@@ -42,27 +43,30 @@ export default function Vault({
 	}
 
 	if (isError) {
-		return <p>Error: ${error.message}</p>;
+		return (
+			<div>
+				<span>Error in Vault Navigator</span>
+				<p>Error: ${error.message}</p>
+			</div>
+		);
 	}
 
-	//const mdFiles = data.files.filter((v) => v.endsWith(".md"));
-	const mdFiles = data.files;
+	// Confirm this is the correct typing
+	const files: string[] = data.files;
 
 	return (
-		<div>
-			<ul>
-				{mdFiles.map((v) => {
-					return (
-						<li
-							className="cursor-pointer"
-							key={v}
-							onMouseDown={() => pushPath(v)}
-						>
-							{v}
-						</li>
-					);
-				})}
-			</ul>
-		</div>
+		<>
+			{files?.map((v) => {
+				return (
+					<li
+						className="cursor-pointer"
+						key={v}
+						onMouseDown={() => pushPath(v)}
+					>
+						{v}
+					</li>
+				);
+			})}
+		</>
 	);
 }

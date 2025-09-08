@@ -1,5 +1,7 @@
 /** biome-ignore-all lint/a11y/useAltText: <explanation> */
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import NoteEditor from "./editor/NoteEditor";
 
 export default function Note({
 	apiKey,
@@ -34,6 +36,33 @@ export default function Note({
 		queryFn: fetchVaultFiles,
 	});
 
+	const mutationFn = async (data: string) => {
+		if (!apiKey) {
+			throw new Error("Missing API Key");
+		}
+		const baseURL = `${obsidianURL}/vault`;
+		const fullPath = `${baseURL}/${path}`;
+		const bearer = `Bearer ${apiKey}`;
+		const response = await fetch(fullPath, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "text/markdown",
+				Authorization: bearer,
+			},
+			body: data,
+		});
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+		return response.json();
+	};
+
+	const [content, setContent] = useState("");
+
+	useEffect(() => {
+		setContent(data || "");
+	}, [data]);
+
 	if (isLoading) {
 		return <p>Loading...</p>;
 	}
@@ -42,12 +71,22 @@ export default function Note({
 		return <p>Error: ${error.message}</p>;
 	}
 
+	if (typeof data === "undefined") {
+		return <p>Data is undefined</p>;
+	}
+
+	const handleUpdateData = (data: string) => {
+		setContent(data);
+		mutationFn(data);
+	};
+
 	console.debug("Current State of Data", data);
 
 	return (
-		<div>
+		<div className="w-full h-full">
 			{path}
-			<p>{data}</p>
+			<br />
+			<NoteEditor data={content} updateData={handleUpdateData} />
 		</div>
 	);
 }
