@@ -6,7 +6,13 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode } from "@lexical/rich-text";
 import { useMemo } from "react";
+import { BannerNode } from "./BannerNode/BannerNode";
+import CustomBannerActions from "./CustomBannerActtions/CustomBannerActions";
+import CustomBannerPlugin from "./CustomBannerPlugin/CustomBannerPlugin";
+import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
+import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
 import CustomTextActions from "./CustomTextActions/CustomTextActions";
 import initialState from "./initialState.json";
@@ -31,6 +37,7 @@ export default function NoteEditor() {
 
 	const lexicalConfig: InitialConfigType = {
 		namespace: "My Rich Text Editor",
+		nodes: [HeadingNode, BannerNode],
 		onError: (e) => {
 			console.log("ERROR:", e);
 		},
@@ -45,6 +52,14 @@ export default function NoteEditor() {
 				subscript: "text-subscript",
 				superscript: "text-superscript",
 			},
+			heading: {
+				h1: "text-5xl font-extrabold",
+				h2: "text-4xl font-bold",
+				h3: "text-3xl font-bold",
+				h4: "text-2xl font-bold",
+				h5: "text-xl font-bold",
+			},
+			banner: "banner",
 		},
 		editorState: JSON.stringify(initialState),
 	};
@@ -58,9 +73,13 @@ export default function NoteEditor() {
 				/>
 				<HistoryPlugin />
 				<OnChangePlugin />
+				<CustomHeadingPlugin />
+				<CustomBannerPlugin />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />
+					<CustomHeadingActions />
+					<CustomBannerActions />
 				</div>
 			</LexicalComposer>
 		</div>
