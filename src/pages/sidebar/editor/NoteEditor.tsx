@@ -1,3 +1,6 @@
+import { CodeNode } from "@lexical/code";
+import { LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
 import {
 	InitialConfigType,
 	LexicalComposer,
@@ -5,8 +8,10 @@ import {
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { HeadingNode } from "@lexical/rich-text";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { useMemo } from "react";
 import { BannerNode } from "./BannerNode/BannerNode";
 import CustomBannerActions from "./CustomBannerActtions/CustomBannerActions";
@@ -37,7 +42,18 @@ export default function NoteEditor() {
 
 	const lexicalConfig: InitialConfigType = {
 		namespace: "My Rich Text Editor",
-		nodes: [HeadingNode, BannerNode],
+		nodes: [
+			HeadingNode,
+			BannerNode,
+
+			HorizontalRuleNode,
+			CodeNode,
+			LinkNode,
+			ListNode,
+			ListItemNode,
+			HeadingNode,
+			QuoteNode,
+		],
 		onError: (e) => {
 			console.log("ERROR:", e);
 		},
@@ -75,6 +91,7 @@ export default function NoteEditor() {
 				<OnChangePlugin />
 				<CustomHeadingPlugin />
 				<CustomBannerPlugin />
+				<MarkdownShortcutPlugin />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />
