@@ -1,6 +1,7 @@
 import { CodeNode } from "@lexical/code";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
+import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
 import {
 	InitialConfigType,
 	LexicalComposer,
@@ -20,11 +21,10 @@ import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
 import CustomTextActions from "./CustomTextActions/CustomTextActions";
-import initialState from "./initialState.json";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
 import "./Theme.css";
 
-export default function NoteEditor() {
+export default function NoteEditor({ data }: { data: string }) {
 	const CustomContent = useMemo(() => {
 		return (
 			<ContentEditable
@@ -77,7 +77,7 @@ export default function NoteEditor() {
 			},
 			banner: "banner",
 		},
-		editorState: JSON.stringify(initialState),
+		editorState: () => $convertFromMarkdownString(data, TRANSFORMERS),
 	};
 
 	return (
@@ -91,7 +91,7 @@ export default function NoteEditor() {
 				<OnChangePlugin />
 				<CustomHeadingPlugin />
 				<CustomBannerPlugin />
-				<MarkdownShortcutPlugin />
+				<MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />

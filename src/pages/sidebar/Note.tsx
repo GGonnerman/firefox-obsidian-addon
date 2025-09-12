@@ -86,7 +86,7 @@ export default function Note({
 		<div className="w-full h-full">
 			{path}
 			<br />
-			<NoteEditor />
+			<NoteEditor data={data} key={"key"} />
 		</div>
 	);
 }
