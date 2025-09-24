@@ -24,7 +24,13 @@ import CustomTextActions from "./CustomTextActions/CustomTextActions";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
 import "./Theme.css";
 
-export default function NoteEditor({ data }: { data: string }) {
+export default function NoteEditor({
+	data,
+	setData,
+}: {
+	data: string;
+	setData: (data: string) => void;
+}) {
 	const CustomContent = useMemo(() => {
 		return (
 			<ContentEditable
@@ -88,7 +94,7 @@ export default function NoteEditor({ data }: { data: string }) {
 					ErrorBoundary={LexicalErrorBoundary}
 				/>
 				<HistoryPlugin />
-				<OnChangePlugin />
+				<OnChangePlugin update={setData} />
 				<CustomHeadingPlugin />
 				<CustomBannerPlugin />
 				<MarkdownShortcutPlugin transformers={TRANSFORMERS} />
