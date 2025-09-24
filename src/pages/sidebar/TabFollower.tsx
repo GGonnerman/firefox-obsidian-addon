@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import Browser from "webextension-polyfill";
+import { useState } from "react";
+import Browser, { Tabs } from "webextension-polyfill";
 
 export default function TabFollower({
 	apiKey,
@@ -12,15 +12,30 @@ export default function TabFollower({
 	updatePath: (path: string[]) => void;
 }) {
 	const [currentTab, setCurrentTab] = useState<string>("");
+	const changeCurrentURL = (
+		tabId: number,
+		changeInfo: object,
+		tab: Tabs.Tab,
+	) => {
+		const status = changeInfo?.status;
+		if (!status || status !== "complete") return;
+		if (!tab.active) return;
+		const currentUrl = tab.url;
+		if (!currentUrl) return;
+		if (currentUrl === currentTab) return;
+
+		setCurrentTab(currentUrl);
+	};
 	const updateActiveTab = () => {
 		Browser.tabs
 			.query({ currentWindow: true, active: true })
 			.then((tabs) => setCurrentTab(tabs[0]?.url || ""));
 	};
 
-	useEffect(updateActiveTab, []);
+	//useEffect(updateActiveTab, []);
 
 	Browser.tabs.onActivated.addListener(updateActiveTab);
+	Browser.tabs.onUpdated.addListener(changeCurrentURL);
 
 	const fetchCurrentTabNote = async () => {
 		console.log(`Fetching current tab node for ${currentTab}`);
