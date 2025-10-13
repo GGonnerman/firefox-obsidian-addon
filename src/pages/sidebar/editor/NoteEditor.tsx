@@ -14,13 +14,12 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { useMemo } from "react";
-import { BannerNode } from "./BannerNode/BannerNode";
-import CustomBannerActions from "./CustomBannerActtions/CustomBannerActions";
-import CustomBannerPlugin from "./CustomBannerPlugin/CustomBannerPlugin";
 import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
-import CustomTextActions from "./CustomTextActions/CustomTextActions";
+import { KeywordNode } from "./CustomKeyword/Keyword";
+import { KeywordsPlugin } from "./CustomKeyword/KeywordPlugin";
+import CustomTextActions from "./CustomToolbar/CustomToolbar";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
 import "./Theme.css";
 
@@ -50,7 +49,7 @@ export default function NoteEditor({
 		namespace: "My Rich Text Editor",
 		nodes: [
 			HeadingNode,
-			BannerNode,
+			KeywordNode,
 
 			HorizontalRuleNode,
 			CodeNode,
@@ -81,7 +80,7 @@ export default function NoteEditor({
 				h4: "text-2xl font-bold",
 				h5: "text-xl font-bold",
 			},
-			banner: "banner",
+			keyword: "keyword",
 		},
 		editorState: () => $convertFromMarkdownString(data, TRANSFORMERS),
 	};
@@ -96,13 +95,12 @@ export default function NoteEditor({
 				<HistoryPlugin />
 				<OnChangePlugin update={setData} />
 				<CustomHeadingPlugin />
-				<CustomBannerPlugin />
+				<KeywordsPlugin />
 				<MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />
 					<CustomHeadingActions />
-					<CustomBannerActions />
 				</div>
 			</LexicalComposer>
 		</div>
