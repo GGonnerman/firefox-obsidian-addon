@@ -54,7 +54,7 @@ export default function Note({
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}
-		return response.json();
+		return response.body;
 	};
 
 	const [content, setContent] = useState("");
@@ -77,10 +77,10 @@ export default function Note({
 
 	const handleUpdateData = (data: string) => {
 		setContent(data);
-		mutationFn(data);
+		mutationFn(data).catch((reason) =>
+			console.warn(`Error in handling update data`, data, reason),
+		);
 	};
-
-	console.debug("Current State of Data", data);
 
 	return (
 		<div className="w-full h-full">
