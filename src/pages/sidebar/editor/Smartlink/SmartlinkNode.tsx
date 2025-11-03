@@ -25,7 +25,7 @@ export class SmartlinkNode extends TextNode {
 	}
 
 	static clone(node: SmartlinkNode): SmartlinkNode {
-		return new SmartlinkNode(node.__text, node.__color, node.__key);
+		return new SmartlinkNode(node.__text, node.__key);
 	}
 
 	static importJSON(serializedNode: SerializedSmartlinkNode): SmartlinkNode {
@@ -40,7 +40,7 @@ export class SmartlinkNode extends TextNode {
 		};
 	}
 
-	constructor(text: string, color?: string, key?: NodeKey) {
+	constructor(text: string, key?: NodeKey) {
 		super(text, key);
 		this.__text = text;
 		// Vanilla Milkshake from https://lospec.com/palette-list/vanilla-milkshake
