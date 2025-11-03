@@ -14,14 +14,14 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { useMemo } from "react";
-import { BannerNode } from "./BannerNode/BannerNode";
-import CustomBannerActions from "./CustomBannerActtions/CustomBannerActions";
-import CustomBannerPlugin from "./CustomBannerPlugin/CustomBannerPlugin";
 import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
-import CustomTextActions from "./CustomTextActions/CustomTextActions";
+import CustomTextActions from "./CustomToolbar/CustomToolbar";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
+import { SmartlinkNode } from "./Smartlink/SmartlinkNode";
+import SmartlinkPlugin from "./Smartlink/SmartlinkPlugin";
+import { SMARTLINK } from "./Smartlink/SmartlinkTransformer";
 import "./Theme.css";
 
 export default function NoteEditor({
@@ -50,7 +50,6 @@ export default function NoteEditor({
 		namespace: "My Rich Text Editor",
 		nodes: [
 			HeadingNode,
-			BannerNode,
 
 			HorizontalRuleNode,
 			CodeNode,
@@ -59,6 +58,8 @@ export default function NoteEditor({
 			ListItemNode,
 			HeadingNode,
 			QuoteNode,
+
+			SmartlinkNode,
 		],
 		onError: (e) => {
 			console.log("ERROR:", e);
@@ -81,9 +82,9 @@ export default function NoteEditor({
 				h4: "text-2xl font-bold",
 				h5: "text-xl font-bold",
 			},
-			banner: "banner",
 		},
-		editorState: () => $convertFromMarkdownString(data, TRANSFORMERS),
+		editorState: () =>
+			$convertFromMarkdownString(data, [SMARTLINK, ...TRANSFORMERS]),
 	};
 
 	return (
@@ -96,13 +97,12 @@ export default function NoteEditor({
 				<HistoryPlugin />
 				<OnChangePlugin update={setData} />
 				<CustomHeadingPlugin />
-				<CustomBannerPlugin />
-				<MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+				<SmartlinkPlugin />
+				<MarkdownShortcutPlugin transformers={[SMARTLINK, ...TRANSFORMERS]} />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />
 					<CustomHeadingActions />
-					<CustomBannerActions />
 				</div>
 			</LexicalComposer>
 		</div>
