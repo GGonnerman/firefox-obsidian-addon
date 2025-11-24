@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import Browser, { Tabs } from "webextension-polyfill";
+import { useCallback, useEffect, useState } from "react";
+import Browser, { type Tabs } from "webextension-polyfill";
 
 export default function TabFollower({
 	apiKey,
@@ -11,36 +11,59 @@ export default function TabFollower({
 	obsidianURL: string;
 	updatePath: (path: string[]) => void;
 }) {
-	const [currentTab, setCurrentTab] = useState<string>("");
-	const changeCurrentURL = (
-		tabId: number,
-		changeInfo: object,
-		tab: Tabs.Tab,
-	) => {
-		const status = changeInfo?.status;
-		if (!status || status !== "complete") return;
-		if (!tab.active) return;
-		const currentUrl = tab.url;
-		if (!currentUrl) return;
-		if (currentUrl === currentTab) return;
+	const [currentTab, _setCurrentTab] = useState<string>("");
+	const [isFollowing, setIsFollowing] = useState(true);
 
-		setCurrentTab(currentUrl);
-	};
-	const updateActiveTab = () => {
+	const setCurrentTab = useCallback((url: string) => {
+		// These pages should be used interchangable to better match users
+		// expected behavior.
+		if (url === "about:blank") {
+			url = "about:newtab";
+		}
+		_setCurrentTab(url);
+	}, []);
+
+	// Indicates the current tab url was updated/changed
+	const changeCurrentURL = useCallback(
+		(
+			_tabId: number,
+			_changeInfo: Tabs.OnUpdatedChangeInfoType,
+			tab: Tabs.Tab,
+		) => {
+			//const status = changeInfo.status;
+			//if (!status || status !== "complete") return;
+			if (!tab.active) return;
+			const currentUrl = tab.url;
+			if (!currentUrl) return;
+			if (currentUrl === currentTab) return;
+
+			setCurrentTab(currentUrl);
+		},
+		[currentTab, setCurrentTab],
+	);
+
+	// Indicates going to a new/different tab
+	const updateActiveTab = useCallback(() => {
 		Browser.tabs
 			.query({ currentWindow: true, active: true })
-			.then((tabs) => setCurrentTab(tabs[0]?.url || ""));
-	};
+			.then((tabs) => setCurrentTab(tabs[0].url || ""));
+	}, [setCurrentTab]);
 
-	//useEffect(updateActiveTab, []);
-
-	Browser.tabs.onActivated.addListener(updateActiveTab);
-	Browser.tabs.onUpdated.addListener(changeCurrentURL);
+	useEffect(() => {
+		Browser.tabs.onActivated.addListener(updateActiveTab);
+		Browser.tabs.onUpdated.addListener(changeCurrentURL);
+		return () => {
+			Browser.tabs.onActivated.removeListener(updateActiveTab);
+			Browser.tabs.onUpdated.removeListener(changeCurrentURL);
+		};
+	}, [changeCurrentURL, updateActiveTab]);
+	//Browser.tabs.onActivated.addListener(updateActiveTab);
+	//Browser.tabs.onUpdated.addListener(changeCurrentURL);
 
 	const fetchCurrentTabNote = async () => {
 		console.log(`Fetching current tab node for ${currentTab}`);
 		if (!apiKey || apiKey === "") {
-			throw new Error("Missing API Key");
+			throw new Error("Missing API Key for follower");
 		}
 		const baseURL = `${obsidianURL}/search/`;
 		const bearer = `Bearer ${apiKey}`;
@@ -59,15 +82,28 @@ export default function TabFollower({
 				`Network response was not ok: ${JSON.stringify(response)}`,
 			);
 		}
-		return response.json();
+		const json = await response.json();
+		console.log(`Received the response of`, json);
+		return json;
 	};
 
-	const { isLoading, isError, data, error } = useQuery({
+	const {
+		isLoading: isPending,
+		isError,
+		data,
+		error,
+	} = useQuery({
 		queryKey: [currentTab],
 		queryFn: fetchCurrentTabNote,
 	});
 
-	if (isLoading) {
+	useEffect(() => {
+		if (!data || data.length < 1 || !isFollowing) return;
+		updatePath(data[0].filename.split(/(?<=\/)/));
+		console.log(`Path is now, ${data[0].filename}`);
+	}, [data, updatePath, isFollowing]);
+
+	if (isPending) {
 		return <p>Loading...</p>;
 	}
 
@@ -84,16 +120,17 @@ export default function TabFollower({
 	return (
 		<div>
 			<span className="text-gray-500 text-xs">{currentTab}</span>
-			<div>
-				{data && data.length > 0 && (
-					<button
-						type="button"
-						className="cursor-pointer bg-green-300 border-2 rounded-md p-2"
-						onClick={() => updatePath(data[0].filename.split(/(?<=\/)/))}
-					>
-						Go to {data[0].filename}
-					</button>
-				)}
+			<div className="switch-container">
+				<label className="switch">
+					Follow Tabs
+					<input
+						type="checkbox"
+						value="boolean"
+						checked={isFollowing}
+						onClick={() => setIsFollowing((c) => !c)}
+					/>
+					<span></span>
+				</label>
 			</div>
 		</div>
 	);

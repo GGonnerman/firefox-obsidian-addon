@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Navigator from "./Navigator";
 import Note from "./Note";
@@ -7,7 +6,6 @@ import TabFollower from "./TabFollower";
 export default function Sidebar() {
 	const obsidianURL = "http://127.0.0.1:27123";
 
-	const queryClient = new QueryClient();
 	const [apiKey, setApiKey] = useState<string>("");
 	const [rawPath, setPathParts] = useState<string[]>([]);
 	const [path, setPath] = useState("");
@@ -25,6 +23,14 @@ export default function Sidebar() {
 	}, [rawPath]);
 
 	const handleUpdateRawPath = (pathParts: string[]) => {
+		if (
+			pathParts.length === rawPath.length &&
+			pathParts.every((el, i) => {
+				return el === rawPath[i];
+			})
+		) {
+			return;
+		}
 		setPathParts(pathParts);
 	};
 
@@ -34,7 +40,7 @@ export default function Sidebar() {
 	};
 
 	return (
-		<QueryClientProvider client={queryClient}>
+		<>
 			<TabFollower
 				apiKey={apiKey}
 				obsidianURL={obsidianURL}
@@ -57,6 +63,6 @@ export default function Sidebar() {
 					/>
 				)}
 			</div>
-		</QueryClientProvider>
+		</>
 	);
 }

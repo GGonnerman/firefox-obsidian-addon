@@ -10,3 +10,11 @@ body {
 
   position: relative;
 }
+
+.switch-container {
+  margin: 5px;
+}
+
+.switch>input {
+  margin-left: 5px;
+}

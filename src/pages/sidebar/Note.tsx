@@ -14,7 +14,7 @@ export default function Note({
 }) {
 	const fetchVaultFiles = async () => {
 		if (!apiKey) {
-			throw new Error("Missing API Key");
+			throw new Error("Missing API Key for vault fetch");
 		}
 		const baseURL = `${obsidianURL}/vault`;
 		const fullPath = `${baseURL}/${path}`;
@@ -38,7 +38,7 @@ export default function Note({
 
 	const mutationFn = async (data: string) => {
 		if (!apiKey) {
-			throw new Error("Missing API Key");
+			throw new Error("Missing API Key for Mutation");
 		}
 		const baseURL = `${obsidianURL}/vault`;
 		const fullPath = `${baseURL}/${path}`;

@@ -17,7 +17,7 @@ export default function Vault({
 	// TODO [SCRUM-19] Either prefetch paths or cache vault paths and then revalidate on click
 	const fetchVaultPath = async () => {
 		if (!apiKey || apiKey === "") {
-			throw new Error("Missing API Key");
+			throw new Error("Missing API Key for fetch vault path");
 		}
 		const baseURL = `${obsidianURL}/vault/${path}`;
 		const bearer = `Bearer ${apiKey}`;
