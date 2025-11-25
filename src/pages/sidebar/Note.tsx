@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/a11y/useAltText: <explanation> */
+
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { getNote, writeNote } from "./api/note";
 import NoteEditor from "./editor/NoteEditor";
 
 export default function Note({
@@ -12,58 +13,46 @@ export default function Note({
 	obsidianURL: string;
 	path: string;
 }) {
-	const fetchVaultFiles = async () => {
-		if (!apiKey) {
-			throw new Error("Missing API Key");
-		}
-		const baseURL = `${obsidianURL}/vault`;
-		const fullPath = `${baseURL}/${path}`;
-		const bearer = `Bearer ${apiKey}`;
-		const response = await fetch(fullPath, {
-			headers: {
-				accept: "text/markdown",
-				Authorization: bearer,
-			},
-		});
-		if (!response.ok) {
-			throw new Error("Network response was not ok");
-		}
-		return response.text();
-	};
-
-	const { isLoading, isError, data, error } = useQuery({
-		queryKey: ["vaultFiles"],
-		queryFn: fetchVaultFiles,
+	const { isPending, isError, data, error } = useQuery({
+		queryKey: ["vaultFiles", apiKey, obsidianURL, path],
+		queryFn: () => getNote({ apiKey, obsidianURL, path }),
+		gcTime: 0,
 	});
 
-	const mutationFn = async (data: string) => {
-		if (!apiKey) {
-			throw new Error("Missing API Key");
-		}
-		const baseURL = `${obsidianURL}/vault`;
-		const fullPath = `${baseURL}/${path}`;
-		const bearer = `Bearer ${apiKey}`;
-		const response = await fetch(fullPath, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "text/markdown",
-				Authorization: bearer,
-			},
-			body: data,
-		});
-		if (!response.ok) {
-			throw new Error("Network response was not ok");
-		}
-		return response.body;
+	//const [content, setContent] = useState("");
+
+	//useEffect(() => {
+	//	setContent(data || "");
+	//}, [data]);
+
+	//const handleUpdateData = useDebounce((data: string) => {
+	const handleUpdateData = (data: string) => {
+		//setContent(data);
+		writeNote({ apiKey, obsidianURL, path, data }).catch((reason) =>
+			console.warn(`Error in handling update data`, data, reason),
+		);
 	};
 
-	const [content, setContent] = useState("");
+	//const queryClient = useQueryClient();
+	//const {
+	//	status: mutStatus,
+	//	error: mutError,
+	//	mutate,
+	//} = useMutation({
+	//	mutationFn: ({ path, data }: { path: string; data: string | undefined }) =>
+	//		writeNote({ apiKey, obsidianURL, path, data }),
+	//	onSuccess: (data) => {
+	//		queryClient.setQueryData(["vaultFiles", apiKey, obsidianURL, path], data);
+	//	},
+	//});
 
-	useEffect(() => {
-		setContent(data || "");
-	}, [data]);
+	//const x = (data: string) => {
+	//	writeNote({ apiKey, obsidianURL, path, data }).catch((reason) =>
+	//		console.warn(`Error in handling update data`, data, reason),
+	//	);
+	//};
 
-	if (isLoading) {
+	if (isPending) {
 		return <p>Loading...</p>;
 	}
 
@@ -74,13 +63,6 @@ export default function Note({
 	if (typeof data === "undefined") {
 		return <p>Data is undefined</p>;
 	}
-
-	const handleUpdateData = (data: string) => {
-		setContent(data);
-		mutationFn(data).catch((reason) =>
-			console.warn(`Error in handling update data`, data, reason),
-		);
-	};
 
 	return (
 		<div className="w-full h-full">

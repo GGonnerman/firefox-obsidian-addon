@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
+import { searchVault } from "./api/vault";
 
 export default function TabFollower({
 	apiKey,
@@ -22,45 +23,21 @@ export default function TabFollower({
 
 	Browser.tabs.onActivated.addListener(updateActiveTab);
 
-	const fetchCurrentTabNote = async () => {
-		console.log(`Fetching current tab node for ${currentTab}`);
-		if (!apiKey || apiKey === "") {
-			throw new Error("Missing API Key");
-		}
-		const baseURL = `${obsidianURL}/search/`;
-		const bearer = `Bearer ${apiKey}`;
-		const response = await fetch(baseURL, {
-			headers: {
-				"content-type": "application/vnd.olrapi.jsonlogic+json",
-				Authorization: bearer,
-			},
-			method: "POST",
-			body: JSON.stringify({
-				regexp: [currentTab, { var: "frontmatter.url" }],
-			}),
-		});
-		if (!response.ok) {
-			throw new Error(
-				`Network response was not ok: ${JSON.stringify(response)}`,
-			);
-		}
-		return response.json();
-	};
-
-	const { isLoading, isError, data, error } = useQuery({
-		queryKey: [currentTab],
-		queryFn: fetchCurrentTabNote,
+	// Searches for a note with specific header information
+	const query = { regexp: [currentTab, { var: "frontmatter.url" }] };
+	const { isPending, isError, data, error } = useQuery({
+		queryKey: [currentTab, apiKey, obsidianURL, query],
+		queryFn: () => searchVault({ apiKey, obsidianURL, query }),
 	});
 
-	if (isLoading) {
+	if (isPending) {
 		return <p>Loading...</p>;
 	}
 
 	if (isError) {
 		return (
 			<div>
-				<span>Error in Vault Navigator</span>
-				<p>Error: ${error.message}</p>
+				<p>Error in Tab Follower: {error.message}</p>
 			</div>
 		);
 	}
@@ -70,7 +47,7 @@ export default function TabFollower({
 		<div>
 			<span className="text-gray-500 text-xs">{currentTab}</span>
 			<div>
-				{data && data.length > 0 && (
+				{data.length > 0 && (
 					<button
 						type="button"
 						className="cursor-pointer bg-green-300 border-2 rounded-md p-2"
