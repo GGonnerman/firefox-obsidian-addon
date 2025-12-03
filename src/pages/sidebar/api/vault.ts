@@ -38,7 +38,7 @@ export async function getPathFiles({ apiKey, obsidianURL, path }: { apiKey: stri
 const searchResultSchema = z.array(
     z.object({
         filename: z.string(),
-        result: z.string(),
+        result: z.boolean(),
     })
 )
 

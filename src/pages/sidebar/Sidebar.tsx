@@ -19,6 +19,14 @@ export default function Sidebar() {
 	}, [rawPath]);
 
 	const handleUpdateRawPath = (pathParts: string[]) => {
+		if (
+			pathParts.length === rawPath.length &&
+			pathParts.every((el, i) => {
+				return el === rawPath[i];
+			})
+		) {
+			return;
+		}
 		setPathParts(pathParts);
 	};
 
@@ -41,6 +49,7 @@ export default function Sidebar() {
 						id="obsidian-url"
 						placeholder="<enter obsidian url>"
 						className="text-gray-300 bg-gray-700 m-2 p-2 rounded-sm"
+						defaultValue={obsidianURL}
 						ref={obsidianElement}
 					/>
 					<label htmlFor="api-key" className="text-gray-300">
@@ -50,6 +59,7 @@ export default function Sidebar() {
 						id="api-key"
 						placeholder="<enter api key>"
 						className="text-gray-300 bg-gray-700 m-2 p-2 rounded-sm"
+						defaultValue={apiKey}
 						ref={apiElement}
 					/>
 					<p className="text-gray-300 mb-2">

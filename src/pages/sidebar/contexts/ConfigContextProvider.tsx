@@ -23,7 +23,11 @@ export function ConfigContextProvider({ children }: { children: ReactNode }) {
 	const [apiKey, setApiKey] = useState("");
 
 	useEffect(() => {
-		setObsidialURL(localStorage.getItem(LOCAL_STORAGE_OBSIDIAN_URL) || "");
+		const newObsidianURL =
+			localStorage.getItem(LOCAL_STORAGE_OBSIDIAN_URL) ||
+			"http://127.0.0.1:27123";
+		localStorage.setItem(LOCAL_STORAGE_OBSIDIAN_URL, newObsidianURL);
+		setObsidialURL(newObsidianURL);
 	}, []);
 
 	useEffect(() => {

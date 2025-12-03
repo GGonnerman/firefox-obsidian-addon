@@ -40,6 +40,19 @@ export async function writeNote({ apiKey, obsidianURL, path, data }: { apiKey: s
         throw new Error("Network response was not ok");
     }
 
-    console.log("Write not to a place with some content!")
+    console.log("Wrote note to a place with some content!")
     return data;
+}
+
+export async function createNote({ apiKey, obsidianURL, path, filename, url }: { apiKey: string, obsidianURL: string, path: string | undefined, filename: string, url: string }) {
+    const data = ["---", `url: ${url}`, "---"].join("\n")
+    let fullPath = filename
+
+    if (path !== undefined) {
+        fullPath = `${path}/${fullPath}`;
+    }
+    if (!fullPath.endsWith(".md")) {
+        fullPath = `${fullPath}.md`;
+    }
+    return writeNote({ apiKey, obsidianURL, path: fullPath, data });
 }
