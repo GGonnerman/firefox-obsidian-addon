@@ -1,4 +1,4 @@
-name: Build and Zip Chrome Extension
+name: Build and Zip Firefox Extension
 
 on:
   workflow_dispatch:
@@ -23,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: yarn
  
-      - name: Build Chrome
-        run: yarn build:chrome
+      - name: Build Firefox
+        run: yarn build:firefox
 
-      - name: Upload Chrome extension artifacts
+      - name: Upload Firefox extension artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: vite-web-extension-chrome
-          path: dist_chrome
+          name: vite-web-extension-firefox
+          path: dist_firefox
