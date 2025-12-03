@@ -4,7 +4,7 @@
   "description": "description in manifest.json",
   "browser_specific_settings": {
     "gecko": {
-      "id": "@obsidian-bridge",
+      "id": "@obsidian_bridge",
       "strict_min_version": "142.0",
       "data_collection_permissions": {
         "required": [
