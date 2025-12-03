@@ -1,19 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
+import { useContext } from "react";
 import { getPathFiles } from "./api/vault";
+import { ConfigContext } from "./contexts/ConfigContextProvider";
 
 export default function Vault({
-	apiKey,
-	obsidianURL,
 	path,
 	pushPath,
 	popPath,
 }: {
-	apiKey: string;
-	obsidianURL: string;
 	path: string;
 	pushPath: (path: string) => void;
 	popPath: () => void;
 }) {
+	const { apiKey, obsidianURL } = useContext(ConfigContext);
 	const { isPending, isError, data, error } = useQuery({
 		queryKey: ["vaultPath", apiKey, obsidianURL, path],
 		queryFn: () => getPathFiles({ apiKey, obsidianURL, path }),

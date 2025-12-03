@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ConfigContextProvider } from "./contexts/ConfigContextProvider";
 import Sidebar from "./Sidebar";
 
 const queryClient = new QueryClient();
@@ -7,8 +7,9 @@ const queryClient = new QueryClient();
 export default function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<Sidebar />
-			<ReactQueryDevtools initialIsOpen={true} position="top-left" />
+			<ConfigContextProvider>
+				<Sidebar />
+			</ConfigContextProvider>
 		</QueryClientProvider>
 	);
 }

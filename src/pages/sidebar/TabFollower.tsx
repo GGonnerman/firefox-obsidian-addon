@@ -1,17 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
 import { searchVault } from "./api/vault";
+import { ConfigContext } from "./contexts/ConfigContextProvider";
 
 export default function TabFollower({
-	apiKey,
-	obsidianURL,
 	updatePath,
 }: {
-	apiKey: string;
-	obsidianURL: string;
 	updatePath: (path: string[]) => void;
 }) {
+	const { apiKey, obsidianURL } = useContext(ConfigContext);
 	const [currentTab, setCurrentTab] = useState<string>("");
 	const updateActiveTab = () => {
 		Browser.tabs

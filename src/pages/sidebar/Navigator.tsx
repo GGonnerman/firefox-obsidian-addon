@@ -2,14 +2,10 @@ import Vault from "./Vault";
 
 /** biome-ignore-all lint/a11y/useAltText: <explanation> */
 export default function Navigator({
-	apiKey,
-	obsidianURL,
 	path,
 	pushPath,
 	popPath,
 }: {
-	apiKey: string;
-	obsidianURL: string;
 	path: string;
 	pushPath: (path: string) => void;
 	popPath: () => void;
@@ -23,14 +19,7 @@ export default function Navigator({
 					</li>
 				)}
 				{!path.includes(".") && (
-					<Vault
-						obsidianURL={obsidianURL}
-						apiKey={apiKey}
-						key={path}
-						path={path}
-						pushPath={pushPath}
-						popPath={popPath}
-					/>
+					<Vault key={path} path={path} pushPath={pushPath} popPath={popPath} />
 				)}
 			</ul>
 		</div>
