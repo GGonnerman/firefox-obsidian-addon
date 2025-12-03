@@ -2,6 +2,12 @@
   "manifest_version": 3,
   "name": "Obsidian Bridge",
   "description": "description in manifest.json",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@obsidian-bridge",
+      "strict_min_version": "58.0"
+    }
+  },
   "options_ui": {
     "page": "src/pages/options/index.html"
   },
