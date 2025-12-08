@@ -10,6 +10,11 @@ export default function TabFollower({
 }: {
 	updatePath: (path: string[]) => void;
 }) {
+	// TODO: Make "create new page" only show if there is "synced" note found
+	//       Might actually be more difficult than I expect.
+	// TODO: When using navigation, make that turn *off* follow tab
+	// TODO: Add different matching schemas (base vs domain vs subdomain vs ...).
+	//       Unsure on difficulty
 	const { apiKey, obsidianURL } = useContext(ConfigContext);
 	const [isFollowing, setIsFollowing] = useState<boolean>(true);
 	const [currentTab, setCurrentTab] = useState<Tabs.Tab>();
