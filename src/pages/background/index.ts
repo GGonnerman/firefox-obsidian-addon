@@ -32,18 +32,18 @@ Browser.contextMenus.create(
 
 Browser.contextMenus.onClicked.addListener((info, tab) => {
     let message: saveContentMessage;
-    if (!tab?.url) return;
+    if (!tab?.id) return;
 
     switch (info.menuItemId) {
         case "obsidian-selection":
             if (!info.selectionText) return
-            message = { "url": tab.url, "type": "text", "data": info.selectionText }
+            message = { "id": tab.id, "type": "text", "data": info.selectionText }
             break;
         case "obsidian-image":
             if (!info.srcUrl) return
             console.debug(`Clicked image`, info)
             message = {
-                "url": tab.url,
+                "id": tab.id,
                 "type": "image",
                 "data": info.srcUrl,
             }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const saveContentMessageSchema = z.object({
-    url: z.string(),
+    id: z.int(),
     type: z.enum(["text", "image"]),
     data: z.string(),
 });

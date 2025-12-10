@@ -18,10 +18,12 @@ import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
 import CustomTextActions from "./CustomToolbar/CustomToolbar";
+import { ImageNode } from "./Images/ImageNode";
+import ImagesPlugin from "./Images/ImagesPlugin";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
 import { SmartlinkNode } from "./Smartlink/SmartlinkNode";
 import SmartlinkPlugin from "./Smartlink/SmartlinkPlugin";
-import { SMARTLINK } from "./Smartlink/SmartlinkTransformer";
+import { TextInserterPlugin } from "./TextInserterPlugin/TextInserterPlugin";
 import "./Theme.css";
 
 export default function NoteEditor({
@@ -58,6 +60,8 @@ export default function NoteEditor({
 			ListItemNode,
 			HeadingNode,
 			QuoteNode,
+
+			ImageNode,
 
 			SmartlinkNode,
 		],
@@ -96,7 +100,9 @@ export default function NoteEditor({
 				/>
 				<HistoryPlugin />
 				<OnChangePlugin update={setData} />
+				<TextInserterPlugin />
 				<CustomHeadingPlugin />
+				<ImagesPlugin />
 				<SmartlinkPlugin />
 				<MarkdownShortcutPlugin transformers={[SMARTLINK, ...TRANSFORMERS]} />
 				<div style={{ margin: "20px 0px" }}>
