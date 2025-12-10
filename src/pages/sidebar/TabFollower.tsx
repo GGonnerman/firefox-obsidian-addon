@@ -5,6 +5,11 @@ import { createNote } from "./api/note";
 import { searchVault } from "./api/vault";
 import { ConfigContext } from "./contexts/ConfigContextProvider";
 
+type ShallowTab = {
+	url: string;
+	title: string;
+};
+
 export default function TabFollower({
 	updatePath,
 }: {
@@ -17,68 +22,55 @@ export default function TabFollower({
 	//       Unsure on difficulty
 	const { apiKey, obsidianURL } = useContext(ConfigContext);
 	const [isFollowing, setIsFollowing] = useState<boolean>(true);
-	const [currentTab, setCurrentTab] = useState<Tabs.Tab>();
-	const [currentURL, _setCurrentURL] = useState<string>("");
-	const setCurrentURL = useCallback((url: string) => {
-		// These pages should be used interchangable to better match users
-		// expected behavior.
-		if (url === "about:blank") {
-			url = "about:newtab";
-		}
-		_setCurrentURL(url);
-	}, []);
+	const [tab, _setTab] = useState<ShallowTab>();
 
-	// Indicates the current tab url was updated/changed
-	const changeCurrentURL = useCallback(
-		(
-			_tabId: number,
-			_changeInfo: Tabs.OnUpdatedChangeInfoType,
-			tab: Tabs.Tab,
-		) => {
-			//const status = changeInfo.status;
-			//if (!status || status !== "complete") return;
-			if (!tab.active) return;
-			const newURL = tab.url;
-			if (!newURL) return;
-			setCurrentTab(tab);
-			if (newURL === currentURL) return;
-			console.log("Saw change in curent url", {
-				tab: tab,
-				oldURL: currentURL,
-				newURL: newURL,
+	// Here is where some hard-coding maps can be placed to better match user
+	// expectations/behaviors.
+	const setTab = useCallback(
+		(newTab: Tabs.Tab) => {
+			// newtab and blank should be the 'same' page
+			let { url, title } = newTab;
+			if (url === undefined || title === undefined) return;
+			if (url === "about:blank") {
+				url = "about:newtab";
+			}
+			if (url === tab?.url) {
+				return;
+			}
+			console.log(`Updating url from ${tab?.url || "<unset>"} to ${url}`);
+			_setTab({
+				title,
+				url,
 			});
-
-			setCurrentURL(newURL);
 		},
-		[currentURL, setCurrentURL],
+		[tab],
 	);
 
 	// Indicates going to a new/different tab
 	const updateActiveTab = useCallback(() => {
 		Browser.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
-			setCurrentURL(tabs[0].url || "");
-			setCurrentTab(tabs[0]);
+			setTab(tabs[0]);
 		});
-	}, [setCurrentURL]);
+	}, [setTab]);
 
+	// Set active tabs on initial page load
 	useEffect(updateActiveTab, []);
 
 	useEffect(() => {
 		Browser.tabs.onActivated.addListener(updateActiveTab);
-		Browser.tabs.onUpdated.addListener(changeCurrentURL);
+		Browser.tabs.onUpdated.addListener(updateActiveTab);
 		return () => {
 			Browser.tabs.onActivated.removeListener(updateActiveTab);
-			Browser.tabs.onUpdated.removeListener(changeCurrentURL);
+			Browser.tabs.onUpdated.removeListener(updateActiveTab);
 		};
-	}, [changeCurrentURL, updateActiveTab]);
+	}, [updateActiveTab]);
 
-	//Browser.tabs.onActivated.addListener(updateActiveTab);
-	//Browser.tabs.onUpdated.addListener(changeCurrentURL);
 	// Searches for a note with specific header information
-	const query = { regexp: [currentURL, { var: "frontmatter.url" }] };
+	const url = tab?.url || "";
+	const query = { regexp: [url, { var: "frontmatter.url" }] };
 	const { isPending, isError, data, error } = useQuery({
 		enabled: apiKey !== undefined,
-		queryKey: [currentURL, apiKey, obsidianURL, query],
+		queryKey: [url, apiKey, obsidianURL, query],
 		queryFn: () => searchVault({ apiKey, obsidianURL, query }),
 	});
 
@@ -107,29 +99,29 @@ export default function TabFollower({
 	const createNewPage = async () => {
 		const page_name = prompt(
 			"Enter page name: ",
-			currentTab?.title?.replace(".", "") || "",
+			tab?.title.replace(".", "") || "",
 		);
 		if (!page_name) return;
 		createNote({
 			apiKey,
 			obsidianURL,
 			filename: page_name,
-			url: currentURL,
+			url: url,
 			path: undefined,
 		})
 			.then((_) => window.location.reload())
 			.catch((err) =>
-				console.error("Encountered error when creating new file"),
+				console.error("Encountered error when creating new file", err),
 			);
-		console.log(`Creating a page for ${currentURL}...`);
+		console.log(`Creating a page for ${url}...`);
 	};
 
 	// The split(/(?<=\/)/) will split after slashes and leave them intact!
 	return (
 		<div>
-			<span className="text-gray-500 text-xs">{currentURL}</span>
+			<span className="text-gray-500 text-xs">{url}</span>
 			<br />
-			<span className="text-gray-500 text-xs">{currentTab?.title}</span>
+			<span className="text-gray-500 text-xs">{tab?.title}</span>
 			<div className="flex flex-row justify-between p-3">
 				<div className="switch-container">
 					<label className="switch">
