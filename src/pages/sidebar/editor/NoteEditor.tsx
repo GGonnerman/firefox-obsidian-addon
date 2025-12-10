@@ -18,6 +18,8 @@ import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
 import CustomTextActions from "./CustomToolbar/CustomToolbar";
+import { FrontmatterNode } from "./Frontmatter/FrontmatterNode";
+import FrontmatterPlugin from "./Frontmatter/FrontmatterPlugin";
 import { ImageNode } from "./Images/ImageNode";
 import ImagesPlugin from "./Images/ImagesPlugin";
 import OnChangePlugin from "./OnChangePlugin/OnChangePlugin";
@@ -64,6 +66,7 @@ export default function NoteEditor({
 			ImageNode,
 
 			SmartlinkNode,
+			FrontmatterNode,
 		],
 		onError: (e) => {
 			console.log("ERROR:", e);
@@ -104,7 +107,7 @@ export default function NoteEditor({
 				<CustomHeadingPlugin />
 				<ImagesPlugin />
 				<SmartlinkPlugin />
-				<MarkdownShortcutPlugin transformers={[SMARTLINK, ...TRANSFORMERS]} />
+				<FrontmatterPlugin />
 				<div style={{ margin: "20px 0px" }}>
 					<CustomHistoryActions />
 					<CustomTextActions />
