@@ -1,7 +1,7 @@
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { $convertToMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect } from "react";
-import { SMARTLINK } from "../Smartlink/SmartlinkTransformer";
+import { EDITOR_TRANSFORMERS } from "../Transformers";
 
 export default function OnChangePlugin({
 	update,
@@ -12,11 +12,8 @@ export default function OnChangePlugin({
 	useEffect(() => {
 		return editor.registerUpdateListener(({ editorState }) => {
 			editorState.read(() => {
-				update($convertToMarkdownString([SMARTLINK, ...TRANSFORMERS]));
-				console.log(
-					"MD DATA",
-					$convertToMarkdownString([SMARTLINK, ...TRANSFORMERS]),
-				);
+				update($convertToMarkdownString(EDITOR_TRANSFORMERS));
+				console.log("MD DATA", $convertToMarkdownString(EDITOR_TRANSFORMERS));
 				console.log("JSON DATA", editor.toJSON());
 			});
 		});
