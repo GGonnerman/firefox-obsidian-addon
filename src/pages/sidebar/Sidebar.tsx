@@ -1,4 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useRef, useState } from "react";
+import { SixDotsScale } from "react-svg-spinners";
+import { aboutVault } from "./api/vault";
 import { ConfigContext } from "./contexts/ConfigContextProvider";
 import Navigator from "./Navigator";
 import Note from "./Note";
@@ -10,6 +13,12 @@ export default function Sidebar() {
 
 	const { apiKey, obsidianURL, setApiKey, setObsidianURL } =
 		useContext(ConfigContext);
+
+	const { isPending, isError, data, error } = useQuery({
+		enabled: apiKey !== undefined,
+		queryKey: [apiKey, obsidianURL],
+		queryFn: () => aboutVault({ apiKey, obsidianURL }),
+	});
 
 	const pushPath = (newPart: string) => {
 		setPathParts((curr) => [...curr, newPart]);
@@ -72,7 +81,7 @@ export default function Sidebar() {
 						>
 							Obsidian Local Rest API
 						</a>
-						. Then, inside of Obsidian go to Settings -&gt; Community Plugins
+						. Then,, inside of Obsidian go to Settings -&gt; Community Plugins
 						-&gt; Local REST API and retrieve the url and api key. Note:
 						currently http is required and obsidian must be running in the
 						background while using the extension.
@@ -92,6 +101,34 @@ export default function Sidebar() {
 						These values can be changed anytime in the extension popup.
 					</p>
 				</div>
+			</div>
+		);
+	}
+
+	if (isPending) {
+		return (
+			<div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800 flex flex-col justify-center items-center">
+				<p className="text-gray-300 text-2xl">
+					<SixDotsScale
+						width="25vmin"
+						height="25vmin"
+						color="oklch(87.2% 0.01 258.338)"
+					/>
+				</p>
+			</div>
+		);
+	}
+
+	console.debug(`Data Status: ${data}`);
+
+	if (isError) {
+		return (
+			<div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800 flex flex-col justify-center items-center">
+				<p className="text-gray-300 text-2xl">
+					Unable to connect to database. Check credentials in the extension and
+					ensure Obsidian is running
+				</p>
+				<p>{error.message}</p>
 			</div>
 		);
 	}

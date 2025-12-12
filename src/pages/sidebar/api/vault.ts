@@ -70,3 +70,43 @@ export async function searchVault({ apiKey, obsidianURL, query }: { apiKey: stri
 
     return searchResults.data;
 }
+
+// NOTE: This schema is not complete
+const aboutResultSchema = z.object({
+    "authenticated": z.boolean(),
+    "status": z.string(),
+    "service": z.string(),
+    "versions": z.object({
+        "obsidian": z.string(),
+        "self": z.string(),
+    })
+})
+type AboutResult = z.infer<typeof aboutResultSchema>
+
+
+export async function aboutVault({ apiKey, obsidianURL }: { apiKey: string, obsidianURL: string }): Promise<AboutResult> {
+    const baseURL = `${obsidianURL}`;
+    const bearer = `Bearer ${apiKey}`;
+
+    const response = await fetch(baseURL, {
+        headers: {
+            accept: "application/json",
+            Authorization: bearer,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error("Network response was not ok");
+    }
+
+    const json = await response.json()
+    const aboutResult = aboutResultSchema.safeParse(json);
+
+    if (!aboutResult.success) {
+        console.debug(`JSON: ${JSON.stringify(json)}`)
+        throw new Error("Received malformed response from about");
+    }
+
+    // We don't actually care about the result, just that there was a result
+    return aboutResult.data
+}

@@ -45,10 +45,7 @@ export default function Note({ path }: { path: string }) {
 
 	return (
 		<div className="w-full h-full">
-			{path}
-			<br />
-			{localState}
-			<br />
+			<h3 className="text-center text-2xl">{path}</h3>
 			{localState && <NoteEditor data={localState} setData={setLocalState} />}
 		</div>
 	);
