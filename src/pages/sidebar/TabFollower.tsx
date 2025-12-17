@@ -1,5 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+	Dispatch,
+	SetStateAction,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import Browser, { type Tabs } from "webextension-polyfill";
 import { createNote } from "./api/note";
 import { searchVault } from "./api/vault";
@@ -11,18 +18,26 @@ type ShallowTab = {
 };
 
 export default function TabFollower({
-	updatePath,
+	setRealPath,
+	realPath,
+	isFollowing,
+	setIsFollowing,
 }: {
-	updatePath: (path: string[]) => void;
+	setRealPath: (segments: string[]) => void;
+	realPath: string[];
+	isFollowing: boolean;
+	setIsFollowing: Dispatch<SetStateAction<boolean>>;
 }) {
-	// TODO: Make "create new page" only show if there is "synced" note found
-	//       Might actually be more difficult than I expect.
-	// TODO: When using navigation, make that turn *off* follow tab
 	// TODO: Add different matching schemas (base vs domain vs subdomain vs ...).
 	//       Unsure on difficulty
 	const { apiKey, obsidianURL } = useContext(ConfigContext);
-	const [isFollowing, setIsFollowing] = useState<boolean>(true);
 	const [tab, _setTab] = useState<ShallowTab>();
+	const [idealPath, setIdealPath] = useState<string[]>([]);
+
+	const isSynced =
+		realPath.length > 0 &&
+		realPath.length === idealPath.length &&
+		realPath.every((val, i) => val === idealPath[i]);
 
 	// Here is where some hard-coding maps can be placed to better match user
 	// expectations/behaviors.
@@ -67,7 +82,10 @@ export default function TabFollower({
 
 	// Searches for a note with specific header information
 	const url = tab?.url || "";
-	const query = { regexp: [url, { var: "frontmatter.url" }] };
+	const urlRegex = (() => {
+		return url;
+	})();
+	const query = { regexp: [urlRegex, { var: "frontmatter.url" }] };
 	const { isPending, isError, data, error } = useQuery({
 		enabled: apiKey !== undefined,
 		queryKey: [url, apiKey, obsidianURL, query],
@@ -75,10 +93,16 @@ export default function TabFollower({
 	});
 
 	useEffect(() => {
-		if (!data || data.length < 1 || !isFollowing) return;
-		updatePath(data[0].filename.split(/(?<=\/)/));
+		if (!data || data.length < 1) {
+			setIdealPath([]);
+			return;
+		}
+		const newIdealPath = data[0].filename.split(/(?<=\/)/);
+		setIdealPath(newIdealPath);
+		if (!isFollowing) return;
+		setRealPath(newIdealPath);
 		console.log(`Path is now, ${data[0].filename}`);
-	}, [data, updatePath, isFollowing]);
+	}, [data, setIdealPath, isFollowing]);
 
 	if (apiKey === undefined) {
 		return <p>Missing API Key in tab followeer</p>;
@@ -95,6 +119,10 @@ export default function TabFollower({
 			</div>
 		);
 	}
+
+	const gotoPage = () => {
+		setRealPath(idealPath);
+	};
 
 	const createNewPage = async () => {
 		const page_name = prompt(
@@ -119,6 +147,12 @@ export default function TabFollower({
 	// The split(/(?<=\/)/) will split after slashes and leave them intact!
 	return (
 		<div>
+			<div>I am {(isSynced && "synced") || "freeeeee"}</div>
+			<div>
+				{idealPath.map((x, i) => (
+					<span key={i}>{x}/</span>
+				))}
+			</div>
 			<span className="text-gray-500 text-xs">{url}</span>
 			<br />
 			<span className="text-gray-500 text-xs">{tab?.title}</span>
@@ -136,13 +170,24 @@ export default function TabFollower({
 					</label>
 				</div>
 				<div>
-					<button
-						type="button"
-						onClick={createNewPage}
-						className="cursor-pointer bg-green-300 border-1 rounded-md p-1"
-					>
-						Create New Page
-					</button>
+					{(idealPath.length === 0 && (
+						<button
+							type="button"
+							onClick={createNewPage}
+							className="cursor-pointer bg-green-300 border-1 rounded-md p-1"
+						>
+							Create New Page
+						</button>
+					)) ||
+						(!isSynced && (
+							<button
+								type="button"
+								onClick={gotoPage}
+								className="cursor-pointer bg-green-300 border-1 rounded-md p-1"
+							>
+								Go To Page
+							</button>
+						))}
 				</div>
 			</div>
 		</div>

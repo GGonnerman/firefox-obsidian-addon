@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import { saveContentMessage } from "../Schemas";
+import type { saveContentMessage } from "../Schemas";
 
 console.log('background script loaded');
 
@@ -31,19 +31,21 @@ Browser.contextMenus.create(
 );
 
 Browser.contextMenus.onClicked.addListener((info, tab) => {
+    console.debug(`Printing content message`, { info, tab })
     let message: saveContentMessage;
-    if (!tab?.id) return;
+    if (!tab?.id || !tab?.url) return;
 
     switch (info.menuItemId) {
         case "obsidian-selection":
             if (!info.selectionText) return
-            message = { "id": tab.id, "type": "text", "data": info.selectionText }
+            message = { "id": tab.id, "url": tab.url, "type": "text", "data": info.selectionText }
             break;
         case "obsidian-image":
             if (!info.srcUrl) return
             console.debug(`Clicked image`, info)
             message = {
                 "id": tab.id,
+                "url": tab.url,
                 "type": "image",
                 "data": info.srcUrl,
             }

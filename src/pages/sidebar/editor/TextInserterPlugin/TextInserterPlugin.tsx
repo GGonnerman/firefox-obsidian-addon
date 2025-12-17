@@ -1,3 +1,4 @@
+import { $createLinkNode } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createQuoteNode } from "@lexical/rich-text";
 import {
@@ -17,8 +18,13 @@ export const TextInserterPlugin = () => {
 				const root = $getRoot();
 				if (message.type === "text") {
 					const quoteNode = $createQuoteNode();
-					const textNode = $createTextNode(`${message.data}`);
-					quoteNode.append(textNode);
+					const baseURL = message.url;
+					const encodedText = encodeURI(message.data);
+					const linkedURL = `${baseURL}#:~:text=${encodedText}`;
+					const linkNode = $createLinkNode(linkedURL);
+					const textNode = $createTextNode(message.data);
+					linkNode.append(textNode);
+					quoteNode.append(linkNode);
 					root.append(quoteNode);
 				} else {
 					// Must be image
