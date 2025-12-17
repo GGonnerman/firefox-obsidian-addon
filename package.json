@@ -1,11 +1,11 @@
 {
-  "name": "vite-web-extension",
-  "version": "1.4.0",
-  "description": "A simple chrome & firefox extension template with Vite, React, TypeScript and Tailwind CSS.",
+  "name": "obsidian-bridge",
+  "version": "1.5.0",
+  "description": "An addon that allows interacting with your Obidian vault straight from the web browser",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JohnBra/vite-web-extension.git"
+    "url": "https://github.com/GGonnerman/firefox-obsidian-addon"
   },
   "scripts": {
     "build": "vite build --config vite.config.chrome.ts",

@@ -25,7 +25,7 @@ This is a firefox extension that allow easy interaction with a local obsidian in
 
 - 1. First, install npm dependencies `npm install --legacy-peer-deps`
 - 2. To make a production build, run `npm run build:firefox`
-- 3. To create the zip, go into the newly created `dist_firefox` directory and run `zip -r -FS ../vite-web-extension-firefox *`
+- 3. To create the zip, go into the newly created `dist_firefox` directory and run `zip -r -FS ../obsidian-bridge-firefox *`
 
 ### Option 3
 
