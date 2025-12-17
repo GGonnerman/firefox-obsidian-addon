@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { FORMAT_TEXT_COMMAND, TextFormatType } from "lexical";
+import { FORMAT_TEXT_COMMAND, type TextFormatType } from "lexical";
 
 export default function CustomTextActions() {
 	const [editor] = useLexicalComposerContext();
@@ -9,33 +9,38 @@ export default function CustomTextActions() {
 	};
 
 	return (
-		<div style={{ marginTop: "10px" }}>
-			<span style={{ fontWeight: "bold" }}>Text actions</span>
-			<div>
-				{[
-					"Bold",
-					"Italic",
-					"Underline",
-					"Code",
-					"Highlight",
-					"Strikethrough",
-					"Subscript",
-					"Superscript",
-				].map((value) => {
-					return (
-						<button
-							type="button"
-							key={value}
-							onClick={() =>
-								handleOnClick(value.toLowerCase() as TextFormatType)
-							}
-							className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded px-2 py-1 m-1"
-						>
-							{value}
-						</button>
-					);
-				})}
-			</div>
-		</div>
+		<select
+			name="formats"
+			id="formats"
+			value="placeholder"
+			className="w-20 text-center h-8 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded px-2 py-1 m-1"
+		>
+			<option disabled selected className="hidden" value="placeholder">
+				Format
+			</option>
+			{[
+				"Bold",
+				"Italic",
+				"Underline",
+				"Code",
+				"Highlight",
+				"Strikethrough",
+				"Subscript",
+				"Superscript",
+			].map((tag) => {
+				return (
+					<option
+						value={tag}
+						key={tag}
+						onClick={(e) => {
+							handleOnClick(tag.toLowerCase() as TextFormatType);
+							e.preventDefault();
+						}}
+					>
+						{tag}
+					</option>
+				);
+			})}
+		</select>
 	);
 }

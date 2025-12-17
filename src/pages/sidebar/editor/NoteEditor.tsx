@@ -20,6 +20,7 @@ import { useMemo } from "react";
 import CustomHeadingActions from "./CustomHeadingActions/CustomHeadingActions";
 import CustomHeadingPlugin from "./CustomHeadingPlugin/CustomHeadingPlugin";
 import CustomHistoryActions from "./CustomHistoryActions";
+import CustomParagraphPlugin from "./CustomParagraphPlugin/CustomParagraphPlugin";
 import CustomTextActions from "./CustomToolbar/CustomToolbar";
 import { FrontmatterNode } from "./Frontmatter/FrontmatterNode";
 import FrontmatterPlugin from "./Frontmatter/FrontmatterPlugin";
@@ -44,18 +45,19 @@ export default function NoteEditor({
 			<ContentEditable
 				style={{
 					position: "relative",
-					borderColor: "rgba(255,211,2,0.68)",
-					border: "2px solid red",
-					borderRadius: "5px",
+					borderWidth: "2px 0px",
+					borderColor: "black",
+					borderStyle: "solid",
 					maxWidth: "100%",
 					padding: "10px",
+					margin: "0px",
 				}}
 			/>
 		);
 	}, []);
 
 	const lexicalConfig: InitialConfigType = {
-		namespace: "My Rich Text Editor",
+		namespace: "Note Editor",
 		nodes: [
 			HeadingNode,
 
@@ -122,8 +124,13 @@ export default function NoteEditor({
 	};
 
 	return (
-		<div style={{ padding: "20px" }}>
+		<div style={{ padding: "0px" }}>
 			<LexicalComposer initialConfig={lexicalConfig}>
+				<div className="m-2 flex flex-row justify-around items-center">
+					<CustomHistoryActions />
+					<CustomTextActions />
+					<CustomHeadingActions />
+				</div>
 				<RichTextPlugin
 					contentEditable={CustomContent}
 					ErrorBoundary={LexicalErrorBoundary}
@@ -132,6 +139,7 @@ export default function NoteEditor({
 				<OnChangePlugin update={setData} />
 				<TextInserterPlugin />
 				<CustomHeadingPlugin />
+				<CustomParagraphPlugin />
 				<TabIndentationPlugin />
 				<ImagesPlugin />
 				<ListPlugin />
@@ -139,11 +147,6 @@ export default function NoteEditor({
 				<FrontmatterPlugin />
 				<CheckListPlugin />
 				<MarkdownShortcutPlugin transformers={EDITOR_TRANSFORMERS} />
-				<div style={{ margin: "20px 0px" }}>
-					<CustomHistoryActions />
-					<CustomTextActions />
-					<CustomHeadingActions />
-				</div>
 			</LexicalComposer>
 		</div>
 	);

@@ -122,13 +122,13 @@ export default function Sidebar() {
 	console.debug(`Data Status: ${data}`);
 
 	if (isError) {
+		console.error(`Unable to access database. Error: ${error}`);
 		return (
 			<div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800 flex flex-col justify-center items-center">
 				<p className="text-gray-300 text-2xl">
 					Unable to connect to database. Check credentials in the extension and
 					ensure Obsidian is running
 				</p>
-				<p>{error.message}</p>
 			</div>
 		);
 	}
