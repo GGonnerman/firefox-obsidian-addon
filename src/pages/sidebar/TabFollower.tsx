@@ -1,10 +1,16 @@
+import {
+	generateMatchingRegex,
+	getMatchingSchema,
+	MatchingSchema,
+} from "@src/utils/urlMatching";
 import { useQuery } from "@tanstack/react-query";
 import {
-	Dispatch,
-	SetStateAction,
+	type Dispatch,
+	type SetStateAction,
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 import Browser, { type Tabs } from "webextension-polyfill";
@@ -33,6 +39,7 @@ export default function TabFollower({
 	const { apiKey, obsidianURL } = useContext(ConfigContext);
 	const [tab, _setTab] = useState<ShallowTab>();
 	const [idealPath, setIdealPath] = useState<string[]>([]);
+	const [schema, setSchema] = useState<MatchingSchema>();
 
 	const isSynced =
 		realPath.length > 0 &&
@@ -80,11 +87,23 @@ export default function TabFollower({
 		};
 	}, [updateActiveTab]);
 
-	// Searches for a note with specific header information
 	const url = tab?.url || "";
-	const urlRegex = (() => {
-		return url;
-	})();
+	// Searches for a note with specific header information
+	const urlRegex = useMemo(() => {
+		// If the url is not valid, just return it and pretend everything is ok
+		if (!URL.canParse(url)) return url;
+		const parsedURL = new URL(url);
+		// Special parsing rule for built-in "about" pages
+		const matchingRules = {
+			"https://en.wikipedia.org": MatchingSchema.Host,
+			"https://en.wikipedia.org/wiki/German_Empire": MatchingSchema.Path,
+		};
+		const schema = getMatchingSchema(parsedURL, matchingRules);
+		setSchema(schema);
+		const regex = generateMatchingRegex(parsedURL, schema);
+		console.log(`Planning a query for '${regex}'...`);
+		return regex;
+	}, [url]);
 	const query = { regexp: [urlRegex, { var: "frontmatter.url" }] };
 	const { isPending, isError, data, error } = useQuery({
 		enabled: apiKey !== undefined,
@@ -144,6 +163,10 @@ export default function TabFollower({
 		console.log(`Creating a page for ${url}...`);
 	};
 
+	const addPathMatcher = async () => {
+		console.log(`Adding path match for ${url}...`);
+	};
+
 	// The split(/(?<=\/)/) will split after slashes and leave them intact!
 	return (
 		<div>
@@ -157,6 +180,7 @@ export default function TabFollower({
 			<br />
 			<span className="text-gray-500 text-xs">{tab?.title}</span>
 			<div className="flex flex-row justify-between p-3">
+				(schema={schema})
 				<div className="switch-container">
 					<label className="switch">
 						Follow Tabs
@@ -179,6 +203,18 @@ export default function TabFollower({
 							Create New Page
 						</button>
 					)) ||
+						(schema === 0 && (
+							<button
+								type="button"
+								onClick={() => {
+									createNewPage();
+									addPathMatcher();
+								}}
+								className="cursor-pointer bg-gray-300 border-1 rounded-md p-1"
+							>
+								Create Specific Page
+							</button>
+						)) ||
 						(!isSynced && (
 							<button
 								type="button"
