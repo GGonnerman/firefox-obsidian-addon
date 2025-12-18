@@ -13,7 +13,7 @@ export default function CustomTextActions() {
 			name="formats"
 			id="formats"
 			value="placeholder"
-			className="w-20 text-center h-8 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded px-2 py-1 m-1"
+			className="w-20 text-center h-8 bg-transparent hover:bg-blue-400 text-blue-300 font-semibold hover:text-white border border-blue-300 hover:border-transparent rounded px-2 py-1 m-1"
 		>
 			<option disabled selected className="hidden" value="placeholder">
 				Format

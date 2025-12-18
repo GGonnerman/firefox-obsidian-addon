@@ -67,14 +67,14 @@ export default function Sidebar() {
 	}
 
 	return (
-		<>
+		<div className="bg-gray-800 w-full h-full flex flex-col text-white">
 			<TabFollower
 				setRealPath={setPathSegments}
 				realPath={pathSegments}
 				isFollowing={isFollowing}
 				setIsFollowing={setIsFollowing}
 			/>
-			<div className="w-full h-full">
+			<div className="w-full min-h-0 grow flex flex-col">
 				<Navigator
 					path={path}
 					pushPath={pushPathSegment}
@@ -82,6 +82,6 @@ export default function Sidebar() {
 				/>
 				{path.includes(".") && <Note key={path} path={path} />}
 			</div>
-		</>
+		</div>
 	);
 }

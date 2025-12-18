@@ -20,14 +20,19 @@ export type UrlSchema = {
 export function getMatchingSchemas(url: URL, matchingRules: UrlSchema[]): MatchingSchema[] {
     const schemas: MatchingSchema[] = [];
     // The schemas get less specific, so the "most-specific" rules are checked first
-    for (const section of [
+    const sections = url.protocol === "about:" ? [
+        url.protocol,
+        `${url.protocol}${url.pathname}`,
+    ] : [
         url.href,
         `${url.origin}${url.pathname}${url.search}`,
         `${url.origin}${url.pathname}`,
         url.origin,
         url.host,
         url.hostname
-    ]) {
+    ]
+
+    for (const section of sections) {
         for (const rule of matchingRules) {
             if (rule.url === section && !schemas.includes(rule.schema)) {
                 schemas.push(rule.schema);

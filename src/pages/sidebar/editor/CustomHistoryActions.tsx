@@ -10,7 +10,7 @@ export default function CustomHistoryActions() {
 				type="button"
 				title="Undo"
 				onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-				className="h-8 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded px-2 py-1 m-1"
+				className="h-8 bg-transparent hover:bg-blue-400 text-blue-300 font-semibold hover:text-white border border-blue-300 hover:border-transparent rounded px-2 py-1 m-1"
 			>
 				<GrUndo />
 			</button>
@@ -18,7 +18,7 @@ export default function CustomHistoryActions() {
 				type="button"
 				title="Redo"
 				onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-				className="h-8 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded px-2 py-1 m-1"
+				className="h-8 bg-transparent hover:bg-blue-400 text-blue-300 font-semibold hover:text-white border border-blue-300 hover:border-transparent rounded px-2 py-1 m-1"
 			>
 				<GrRedo />
 			</button>

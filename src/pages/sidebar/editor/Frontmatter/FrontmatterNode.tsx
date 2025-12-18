@@ -45,21 +45,8 @@ export class FrontmatterNode extends TextNode {
 	constructor(text: string, key?: NodeKey) {
 		super(text, key);
 		this.__text = text;
-		// Vanilla Milkshake from https://lospec.com/palette-list/vanilla-milkshake
 		const color_scheme = [
-			"#d9c8bf",
-			"#f98284",
-			"#b0a9e4",
-			"#accce4",
-			"#b3e3da",
-			"#feaae4",
-			"#87a889",
-			"#b0eb93",
-			"#e9f59d",
-			"#ffe6c6",
-			"#dea38b",
-			"#ffc384",
-			"#fff7a0",
+			"oklch(37.3% 0.034 259.733)",
 		];
 		this.__color =
 			color_scheme[Math.floor(Math.random() * color_scheme.length)];

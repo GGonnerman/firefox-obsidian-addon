@@ -11,7 +11,7 @@
 }
 
 .text-code {
-    background-color: #f0f2f5;
+    background-color: #1453b1;
     padding: 1px 0.25rem;
     font-family: Menlo, Consolas, Monaco, monospace;
     font-size: 94%;
@@ -34,7 +34,7 @@
 }
 
 .text-quote {
-    background-color: lightgray;
+    background-color: oklch(44.6% 0.03 256.802);
     padding-left: 15px;
     margin: 5px 0;
 }

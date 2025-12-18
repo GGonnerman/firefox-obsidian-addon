@@ -184,21 +184,7 @@ export default function TabFollower({
 	// The split(/(?<=\/)/) will split after slashes and leave them intact!
 	return (
 		<div>
-			<div>I am {(isSynced && "synced") || "freeeeee"}</div>
-			<div>
-				{idealPath.map((x, i) => (
-					<span key={i}>{x}/</span>
-				))}
-			</div>
-			<span className="text-gray-500 text-xs">{url}</span>
-			<br />
-			<span className="text-gray-500 text-xs">{tab?.title}</span>
 			<div className="flex flex-row justify-between p-3">
-				(schema=
-				{schema?.map((x, i) => (
-					<span key={i}>{x}</span>
-				))}{" "}
-				: <span>{data.schema}</span>)
 				<div className="switch-container">
 					<label className="switch">
 						Follow Tabs
@@ -211,7 +197,7 @@ export default function TabFollower({
 						<span></span>
 					</label>
 				</div>
-				<div>
+				<div  className="text-gray-800">
 					{(idealPath.length === 0 && (
 						<button
 							type="button"
@@ -221,7 +207,7 @@ export default function TabFollower({
 							Create New Page
 						</button>
 					)) ||
-						(schema?.at(0) === 0 && (
+						(isSynced && data.schema === 0 && (
 							<button
 								type="button"
 								onClick={() => {

@@ -46,7 +46,7 @@ export default function NoteEditor({
 				style={{
 					position: "relative",
 					borderWidth: "2px 0px",
-					borderColor: "black",
+					borderColor: "white",
 					borderStyle: "solid",
 					maxWidth: "100%",
 					padding: "10px",
