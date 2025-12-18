@@ -39,7 +39,7 @@ export function getMatchingSchemas(url: URL, matchingRules: UrlSchema[]): Matchi
             }
         }
     }
-    return schemas;
+    return schemas.length > 0 ? schemas : [defaultSchema];
 }
 
 export type RegexSchema = {
