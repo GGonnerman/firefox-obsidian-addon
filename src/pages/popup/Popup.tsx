@@ -3,6 +3,7 @@ import {
 	LOCAL_STORAGE_API_KEY,
 	LOCAL_STORAGE_OBSIDIAN_URL,
 } from "../constants";
+import SchemaSelector from "./SchemaSelector";
 
 export default function Popup() {
 	const [apiKey, setApiKey] = useState<string>("");
@@ -33,7 +34,7 @@ export default function Popup() {
 	}
 
 	return (
-		<div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800">
+		<div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800 overflow-scroll">
 			<div className="flex flex-col gap-2">
 				<label htmlFor="obsidian-url" className="text-white">
 					Obsidian URL:
@@ -56,6 +57,7 @@ export default function Popup() {
 					onChange={(e) => updateApiKey(e.target.value)}
 				/>
 			</div>
+			<SchemaSelector />
 		</div>
 	);
 }

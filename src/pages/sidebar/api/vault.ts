@@ -1,3 +1,4 @@
+import { MatchingSchema, RegexSchema } from '@src/utils/urlMatching';
 import z from 'zod';
 
 const fileListSchema = z.object({
@@ -42,6 +43,12 @@ const searchResultSchema = z.array(
     })
 )
 
+
+export type searchResultReturnSchema = {
+    schema: MatchingSchema
+    results: z.infer<typeof searchResultSchema>;
+}
+
 export async function searchVault({ apiKey, obsidianURL, query }: { apiKey: string, obsidianURL: string, query: object }) {
     const baseURL = `${obsidianURL}/search/`;
     const bearer = `Bearer ${apiKey}`;
@@ -82,6 +89,50 @@ const aboutResultSchema = z.object({
     })
 })
 type AboutResult = z.infer<typeof aboutResultSchema>
+
+
+export async function searchVaultMultiple({ apiKey, obsidianURL, urlRegexes }: { apiKey: string, obsidianURL: string, urlRegexes: RegexSchema[] }): Promise<searchResultReturnSchema> {
+    const baseURL = `${obsidianURL}/search/`;
+    const bearer = `Bearer ${apiKey}`;
+
+    for (const regex of urlRegexes) {
+        const query = { "regexp": [regex.regex, { var: "frontmatter.url" }] }
+        const response = await fetch(baseURL, {
+            headers: {
+                "content-type": "application/vnd.olrapi.jsonlogic+json",
+                Authorization: bearer,
+            },
+            method: "POST",
+            body: JSON.stringify(query),
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `Network response was not ok: ${JSON.stringify(response)}`,
+            );
+        }
+
+        const json = await response.json()
+        const searchResults = searchResultSchema.safeParse(json);
+
+        if (!searchResults.success) {
+            throw new Error("Received malformed response from search");
+        }
+
+        console.debug(`Search result for ${JSON.stringify(query)} returned ${searchResults.data}`)
+        if (searchResults.data.length > 0) {
+            return {
+                schema: regex.schema,
+                results: searchResults.data,
+            };
+        }
+    }
+
+    return {
+        schema: 0,
+        results: []
+    }
+}
 
 
 export async function aboutVault({ apiKey, obsidianURL }: { apiKey: string, obsidianURL: string }): Promise<AboutResult> {

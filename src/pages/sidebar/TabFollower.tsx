@@ -1,7 +1,9 @@
+import useStickyState from "@src/hooks/useStickyState";
 import {
-	generateMatchingRegex,
-	getMatchingSchema,
+	generateMatchingRegexes,
+	getMatchingSchemas,
 	MatchingSchema,
+	type UrlSchema,
 } from "@src/utils/urlMatching";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -14,8 +16,9 @@ import {
 	useState,
 } from "react";
 import Browser, { type Tabs } from "webextension-polyfill";
+import { SCHEMA_KEY } from "../constants";
 import { createNote } from "./api/note";
-import { searchVault } from "./api/vault";
+import { searchVaultMultiple } from "./api/vault";
 import { ConfigContext } from "./contexts/ConfigContextProvider";
 
 type ShallowTab = {
@@ -37,9 +40,10 @@ export default function TabFollower({
 	// TODO: Add different matching schemas (base vs domain vs subdomain vs ...).
 	//       Unsure on difficulty
 	const { apiKey, obsidianURL } = useContext(ConfigContext);
+	const [schemaMap, setSchemaMap] = useStickyState<UrlSchema[]>([], SCHEMA_KEY);
 	const [tab, _setTab] = useState<ShallowTab>();
 	const [idealPath, setIdealPath] = useState<string[]>([]);
-	const [schema, setSchema] = useState<MatchingSchema>();
+	const [schema, setSchema] = useState<MatchingSchema[]>();
 
 	const isSynced =
 		realPath.length > 0 &&
@@ -89,38 +93,40 @@ export default function TabFollower({
 
 	const url = tab?.url || "";
 	// Searches for a note with specific header information
-	const urlRegex = useMemo(() => {
+	const urlRegexes = useMemo(() => {
 		// If the url is not valid, just return it and pretend everything is ok
-		if (!URL.canParse(url)) return url;
+		if (!URL.canParse(url))
+			return [
+				{
+					schema: MatchingSchema.Exact,
+					regex: url,
+				},
+			];
 		const parsedURL = new URL(url);
 		// Special parsing rule for built-in "about" pages
-		const matchingRules = {
-			"https://en.wikipedia.org": MatchingSchema.Host,
-			"https://en.wikipedia.org/wiki/German_Empire": MatchingSchema.Path,
-		};
-		const schema = getMatchingSchema(parsedURL, matchingRules);
-		setSchema(schema);
-		const regex = generateMatchingRegex(parsedURL, schema);
-		console.log(`Planning a query for '${regex}'...`);
-		return regex;
+		const schemas = getMatchingSchemas(parsedURL, schemaMap);
+		console.debug(`Found schemas`, schemas);
+		setSchema(schemas);
+		const regexes = generateMatchingRegexes(parsedURL, schemas);
+		console.debug(`Made regexes`, regexes);
+		return regexes;
 	}, [url]);
-	const query = { regexp: [urlRegex, { var: "frontmatter.url" }] };
 	const { isPending, isError, data, error } = useQuery({
 		enabled: apiKey !== undefined,
-		queryKey: [url, apiKey, obsidianURL, query],
-		queryFn: () => searchVault({ apiKey, obsidianURL, query }),
+		queryKey: [url, apiKey, obsidianURL, urlRegexes],
+		queryFn: () => searchVaultMultiple({ apiKey, obsidianURL, urlRegexes }),
 	});
 
 	useEffect(() => {
-		if (!data || data.length < 1) {
+		if (!data || data.results.length < 1) {
 			setIdealPath([]);
 			return;
 		}
-		const newIdealPath = data[0].filename.split(/(?<=\/)/);
+		const newIdealPath = data.results[0].filename.split(/(?<=\/)/);
 		setIdealPath(newIdealPath);
 		if (!isFollowing) return;
 		setRealPath(newIdealPath);
-		console.log(`Path is now, ${data[0].filename}`);
+		console.log(`Path is now, ${data.results[0].filename}`);
 	}, [data, setIdealPath, isFollowing]);
 
 	if (apiKey === undefined) {
@@ -164,6 +170,14 @@ export default function TabFollower({
 	};
 
 	const addPathMatcher = async () => {
+		setSchemaMap((curr) => [
+			...curr,
+			{
+				id: crypto.randomUUID(),
+				url: url,
+				schema: MatchingSchema.Path,
+			},
+		]);
 		console.log(`Adding path match for ${url}...`);
 	};
 
@@ -180,7 +194,11 @@ export default function TabFollower({
 			<br />
 			<span className="text-gray-500 text-xs">{tab?.title}</span>
 			<div className="flex flex-row justify-between p-3">
-				(schema={schema})
+				(schema=
+				{schema?.map((x, i) => (
+					<span key={i}>{x}</span>
+				))}{" "}
+				: <span>{data.schema}</span>)
 				<div className="switch-container">
 					<label className="switch">
 						Follow Tabs
@@ -203,7 +221,7 @@ export default function TabFollower({
 							Create New Page
 						</button>
 					)) ||
-						(schema === 0 && (
+						(schema?.at(0) === 0 && (
 							<button
 								type="button"
 								onClick={() => {

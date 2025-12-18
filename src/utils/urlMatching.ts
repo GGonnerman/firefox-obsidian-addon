@@ -1,3 +1,5 @@
+import type { UUID } from "crypto";
+
 // Ordered in terms of specificity
 export enum MatchingSchema {
     Host = 0,
@@ -5,18 +7,46 @@ export enum MatchingSchema {
     Exact,
 }
 
-export type MatchingRules = Record<string, MatchingSchema>;
+export const defaultSchema = MatchingSchema.Path;
 
-export function getMatchingSchema(url: URL, matchingRules: MatchingRules): MatchingSchema {
-    // Path is the default matching rul
-    let schema = MatchingSchema.Path;
-    // The schemas get more specific, so the "most-specific" rule is chosen allowing for a nice overriding setup
-    for (const section of [url.hostname, url.host, url.origin, `${url.origin}${url.pathname}`, `${url.origin}${url.pathname}${url.search}`, url.href]) {
-        if (section in matchingRules) {
-            schema = matchingRules[section];
+// export type MatchingRules = Record<string, MatchingSchema>;
+
+export type UrlSchema = {
+    url: string;
+    schema: MatchingSchema;
+    id: UUID;
+};
+
+export function getMatchingSchemas(url: URL, matchingRules: UrlSchema[]): MatchingSchema[] {
+    const schemas: MatchingSchema[] = [];
+    // The schemas get less specific, so the "most-specific" rules are checked first
+    for (const section of [
+        url.href,
+        `${url.origin}${url.pathname}${url.search}`,
+        `${url.origin}${url.pathname}`,
+        url.origin,
+        url.host,
+        url.hostname
+    ]) {
+        for (const rule of matchingRules) {
+            if (rule.url === section && !schemas.includes(rule.schema)) {
+                schemas.push(rule.schema);
+            }
         }
     }
-    return schema;
+    return schemas;
+}
+
+export type RegexSchema = {
+    regex: string;
+    schema: MatchingSchema;
+}
+
+export function generateMatchingRegexes(url: URL, schemas: MatchingSchema[]): RegexSchema[] {
+    return schemas.map(schema => ({
+        schema: schema,
+        regex: generateMatchingRegex(url, schema)
+    }))
 }
 
 export function generateMatchingRegex(url: URL, schema: MatchingSchema): string {
