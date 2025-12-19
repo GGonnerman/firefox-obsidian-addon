@@ -9,7 +9,7 @@
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalTextEntity } from '@lexical/react/useLexicalTextEntity';
-import type { TextNode } from 'lexical';
+import { type TextNode } from 'lexical';
 import type { JSX } from 'react';
 import { useCallback, useEffect } from 'react';
 

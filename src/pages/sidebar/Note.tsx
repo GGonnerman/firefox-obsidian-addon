@@ -79,9 +79,6 @@ export default function Note({ path }: { path: string }) {
 
 	return (
 		<div className="min-h-0 w-full grow" onFocus={reloadPage}>
-			<span> Hash: {mostRecentHash} </span>
-			<span> Ext: {externalChangeTime} </span>
-			<span> Int: {internalChangeTime} </span>
 			<h3 className="text-center text-2xl">{path}</h3>
 			{localState && <NoteEditor path={path} data={localState} setData={setLocalState} setChangeTime={setInternalChangeTime} />}
 		</div>

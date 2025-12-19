@@ -43,12 +43,7 @@ export class SmartlinkNode extends TextNode {
 	constructor(text: string, key?: NodeKey) {
 		super(text, key);
 		this.__text = text;
-		// Vanilla Milkshake from https://lospec.com/palette-list/vanilla-milkshake
-		const color_scheme = [
-			"oklch(43.8% 0.218 303.724)",
-		];
-		this.__color =
-			color_scheme[Math.floor(Math.random() * color_scheme.length)];
+		this.__color = "oklch(43.8% 0.218 303.724)"
 	}
 
 	getContent(): string {
