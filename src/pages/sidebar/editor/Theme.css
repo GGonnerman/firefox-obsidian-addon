@@ -33,8 +33,14 @@
     vertical-align: super;
 }
 
+.text-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: oklch(93.2% 0.032 255.585);
+}
+
 .text-quote {
-    background-color: oklch(44.6% 0.03 256.802);
+    background-color: oklch(37.3% 0.034 259.733);
     padding-left: 15px;
     margin: 5px 0;
 }

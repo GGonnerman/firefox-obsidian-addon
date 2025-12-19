@@ -3,6 +3,7 @@ import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
+import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
 import {
 	type InitialConfigType,
 	LexicalComposer,
@@ -11,6 +12,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -100,6 +102,7 @@ export default function NoteEditor({
 				h5: "text-xl font-bold",
 			},
 			quote: "text-quote",
+			link: "text-link",
 			list: {
 				nested: {
 					listitem: "nestedListItem",
@@ -127,6 +130,21 @@ export default function NoteEditor({
 		editorState: () => $convertFromMarkdownString(data, EDITOR_TRANSFORMERS),
 	};
 
+	// Source: https://github.com/facebook/lexical/blob/1e7e2990008f2e91f0f4c90ef379d9c4c758afdd/packages/lexical-playground/src/plugins/AutoLinkPlugin/index.tsx#L33
+	/*
+	* Copyright (c) Meta Platforms, Inc. and affiliates.
+	*
+	* This source code is licensed under the MIT license found in the
+	* LICENSE file in the root directory of this source tree.
+	*/
+	const urlRegExp = new RegExp(
+	/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/,
+	);
+	function validateUrl(url: string): boolean {
+	return url === 'https://' || urlRegExp.test(url);
+	}
+	// End Source
+
 	return (
 		<div style={{ padding: "0px" }}>
 			<LexicalComposer initialConfig={lexicalConfig}>
@@ -146,6 +164,8 @@ export default function NoteEditor({
 				<CustomParagraphPlugin />
 				<TabIndentationPlugin />
 				<ImagesPlugin />
+				<LinkPlugin validateUrl={validateUrl} />
+				<ClickableLinkPlugin />
 				<ListPlugin />
 				<SmartlinkPlugin />
 				<FrontmatterPlugin />
