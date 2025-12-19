@@ -1,6 +1,6 @@
 {
   "name": "obsidian-bridge",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "An addon that allows interacting with your Obidian vault straight from the web browser",
   "license": "MIT",
   "repository": {
