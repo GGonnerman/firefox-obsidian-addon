@@ -16,7 +16,7 @@ import {
 	useState,
 } from "react";
 import Browser, { type Tabs } from "webextension-polyfill";
-import { SCHEMA_KEY } from "../constants";
+import { NEW_FILE_LOCATION_KEY, SCHEMA_KEY } from "../constants";
 import { createNote } from "./api/note";
 import { searchVaultMultiple } from "./api/vault";
 import { ConfigContext } from "./contexts/ConfigContextProvider";
@@ -44,6 +44,7 @@ export default function TabFollower({
 	const [tab, _setTab] = useState<ShallowTab>();
 	const [idealPath, setIdealPath] = useState<string[]>([]);
 	const [schema, setSchema] = useState<MatchingSchema[]>();
+	const [newFilePath, _setNewFilePath] = useStickyState<string>("", NEW_FILE_LOCATION_KEY)
 
 	const isSynced =
 		realPath.length > 0 &&
@@ -160,7 +161,7 @@ export default function TabFollower({
 			obsidianURL,
 			filename: page_name,
 			url: url,
-			path: undefined,
+			path: newFilePath,
 		})
 			.then((_) => window.location.reload())
 			.catch((err) =>

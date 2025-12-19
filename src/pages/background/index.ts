@@ -38,7 +38,7 @@ Browser.contextMenus.onClicked.addListener((info, tab) => {
     switch (info.menuItemId) {
         case "obsidian-selection":
             if (!info.selectionText) return
-            message = { "id": tab.id, "url": tab.url, "type": "text", "data": info.selectionText }
+            message = { "id": tab.id, "url": tab.url, "type": "text", "data": info.selectionText, kind: "saveContent" }
             break;
         case "obsidian-image":
             if (!info.srcUrl) return
@@ -48,6 +48,7 @@ Browser.contextMenus.onClicked.addListener((info, tab) => {
                 "url": tab.url,
                 "type": "image",
                 "data": info.srcUrl,
+                "kind": "saveContent",
             }
             break;
         default:

@@ -1,7 +1,10 @@
 /** biome-ignore-all lint/a11y/useAltText: <explanation> */
 
+import { hashCode } from "@src/utils/crypto";
 import { useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
+import Browser from "webextension-polyfill";
+import { MessageSchema } from "../Schemas";
 import { getNote, writeNote } from "./api/note";
 import { ConfigContext } from "./contexts/ConfigContextProvider";
 import NoteEditor from "./editor/NoteEditor";
@@ -15,6 +18,37 @@ export default function Note({ path }: { path: string }) {
 	});
 
 	const [localState, setLocalState] = useState("");
+	const [mostRecentHash, setMostRecentHash] = useState<number>();
+	const [internalChangeTime, setInternalChangeTime] = useState<number>(0);
+	const [externalChangeTime, setExternalChangeTime] = useState<number>(0);
+
+	const reloadPage = () => {
+		const localHash = hashCode(localState);
+		console.debug(`My Local has is ${localHash} compared with most recent of ${mostRecentHash}`, { localstate: localState})
+		if(mostRecentHash && mostRecentHash !== hashCode(localState) && externalChangeTime > internalChangeTime) {
+			window.location.reload();
+		}
+	}
+
+	useEffect(() => {
+		Browser.runtime.onMessage.addListener(async (newMsg: any) => {
+			const messageResult =
+				MessageSchema.safeParse(newMsg);
+			if (!messageResult.success) {
+				console.debug(`Failed to decode message`, newMsg);
+				return;
+			}
+
+			if(messageResult.data.kind !== "stale") return;
+
+			const staleMessage = messageResult.data;
+
+			if(path === staleMessage.path) {
+				setMostRecentHash(staleMessage.hash);
+				setExternalChangeTime(staleMessage.timestamp);
+			}
+		});
+	}, [setMostRecentHash]);
 
 	useEffect(() => {
 		if (!isPending && !isError) {
@@ -44,9 +78,12 @@ export default function Note({ path }: { path: string }) {
 	}
 
 	return (
-		<div className="min-h-0 w-full grow">
+		<div className="min-h-0 w-full grow" onFocus={reloadPage}>
+			<span> Hash: {mostRecentHash} </span>
+			<span> Ext: {externalChangeTime} </span>
+			<span> Int: {internalChangeTime} </span>
 			<h3 className="text-center text-2xl">{path}</h3>
-			{localState && <NoteEditor data={localState} setData={setLocalState} />}
+			{localState && <NoteEditor path={path} data={localState} setData={setLocalState} setChangeTime={setInternalChangeTime} />}
 		</div>
 	);
 }

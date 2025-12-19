@@ -45,7 +45,7 @@ export async function writeNote({ apiKey, obsidianURL, path, data }: { apiKey: s
 }
 
 export async function createNote({ apiKey, obsidianURL, path, filename, url }: { apiKey: string, obsidianURL: string, path: string | undefined, filename: string, url: string }) {
-    const data = ["---", `url: ${url}`, "---"].join("\n")
+    const data = ["---", `url: ${url}`, "---", `# ${filename}`].join("\n")
     let fullPath = filename
 
     if (path !== undefined) {

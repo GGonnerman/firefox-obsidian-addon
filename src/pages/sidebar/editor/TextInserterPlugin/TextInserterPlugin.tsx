@@ -2,8 +2,8 @@ import { $createLinkNode } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createQuoteNode } from "@lexical/rich-text";
 import {
-	type saveContentMessage,
-	saveContentMessageSchema,
+	MessageSchema,
+	type saveContentMessage
 } from "@src/pages/Schemas";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { useCallback, useEffect } from "react";
@@ -43,19 +43,21 @@ export const TextInserterPlugin = () => {
 
 	useEffect(() => {
 		Browser.runtime.onMessage.addListener(async (newMsg: any) => {
-			const saveContentMessageResult =
-				saveContentMessageSchema.safeParse(newMsg);
-			if (!saveContentMessageResult.success) {
-				console.debug(`Failed to decode save content message`, newMsg);
+			const messageResult =
+				MessageSchema.safeParse(newMsg);
+			if (!messageResult.success) {
+				console.debug(`Failed to decode message`, newMsg);
 				return;
 			}
+
+			if(messageResult.data.kind !== "saveContent") return;
 
 			const [tab] = await Browser.tabs.query({
 				currentWindow: true,
 				active: true,
 			});
 
-			const saveContentMessage = saveContentMessageResult.data;
+			const saveContentMessage = messageResult.data;
 
 			if (saveContentMessage.id !== tab.id) return;
 

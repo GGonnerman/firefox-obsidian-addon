@@ -1,13 +1,16 @@
+import useStickyState from "@src/hooks/useStickyState";
 import { useEffect, useState } from "react";
 import {
 	LOCAL_STORAGE_API_KEY,
 	LOCAL_STORAGE_OBSIDIAN_URL,
+	NEW_FILE_LOCATION_KEY,
 } from "../constants";
 import SchemaSelector from "./SchemaSelector";
 
 export default function Popup() {
 	const [apiKey, setApiKey] = useState<string>("");
 	const [obsidianURL, setObsidianURL] = useState<string>("");
+	const [newFilePath, setNewFilePath] = useStickyState<string>("", NEW_FILE_LOCATION_KEY)
 
 	useEffect(() => {
 		setApiKey(localStorage.getItem(LOCAL_STORAGE_API_KEY) || "");
@@ -55,6 +58,16 @@ export default function Popup() {
 					className="text-gray-300"
 					value={apiKey}
 					onChange={(e) => updateApiKey(e.target.value)}
+				/>
+				<label htmlFor="default-location" className="text-white">
+					Default New File Location:
+				</label>
+				<input
+					id="new-file-location"
+					placeholder="<enter default new file location>"
+					className="text-gray-300"
+					value={newFilePath}
+					onChange={(e) => setNewFilePath(e.target.value)}
 				/>
 			</div>
 			<SchemaSelector />

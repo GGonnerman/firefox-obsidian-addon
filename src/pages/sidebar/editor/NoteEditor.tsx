@@ -34,11 +34,15 @@ import "./Theme.css";
 import { EDITOR_TRANSFORMERS } from "./Transformers";
 
 export default function NoteEditor({
+	path,
 	data,
 	setData,
+	setChangeTime,
 }: {
+	path: string;
 	data: string;
 	setData: (data: string) => void;
+	setChangeTime: (time: number) => void;
 }) {
 	const CustomContent = useMemo(() => {
 		return (
@@ -136,7 +140,7 @@ export default function NoteEditor({
 					ErrorBoundary={LexicalErrorBoundary}
 				/>
 				<HistoryPlugin />
-				<OnChangePlugin update={setData} />
+				<OnChangePlugin update={setData} path={path} setChangeTime={setChangeTime}/>
 				<TextInserterPlugin />
 				<CustomHeadingPlugin />
 				<CustomParagraphPlugin />
