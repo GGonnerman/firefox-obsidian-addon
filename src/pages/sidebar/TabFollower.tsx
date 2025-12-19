@@ -146,7 +146,7 @@ export default function TabFollower({
 		);
 	}
 
-	const gotoPage = () => {
+	const gotoNote = () => {
 		setRealPath(idealPath);
 	};
 
@@ -223,10 +223,10 @@ export default function TabFollower({
 						(!isSynced && (
 							<button
 								type="button"
-								onClick={gotoPage}
+								onClick={gotoNote}
 								className="cursor-pointer bg-green-300 border-1 rounded-md p-1"
 							>
-								Go To Page
+								Go To Note
 							</button>
 						))}
 				</div>
